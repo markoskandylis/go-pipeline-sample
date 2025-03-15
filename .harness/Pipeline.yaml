@@ -23,7 +23,7 @@ pipeline:
           infrastructure:
             type: KubernetesDirect
             spec:
-              connectorRef: harnessk8sconnector 
+              connectorRef: harnessk8sconnector
               namespace: go-test
               automountServiceAccountToken: true
               nodeSelector: {}
@@ -48,6 +48,7 @@ pipeline:
                       spec:
                         paths:
                           - "*.xml"
+
               - step:
                   type: Run
                   name: Go Build
