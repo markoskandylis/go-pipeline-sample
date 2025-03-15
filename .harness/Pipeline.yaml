@@ -11,69 +11,30 @@ pipeline:
         build: <+input>
   stages:
     - stage:
-        name: "build test and run"
+        name: build test and run
         identifier: build_test_and_run
-        description: "Run Unit Tests, Build, and Push to Docker"
-        type: CI
-        spec:
-          cloneCodebase: true
-          platform:
-            os: Linux
-            arch: Amd64
-          infrastructure:
-            type: KubernetesDirect
+        description: Run Unit Tests, Build, and Push to Docker
+        template:
+          templateRef: gopipeline
+          versionLabel: v1
+          templateInputs:
+            type: CI
             spec:
-              connectorRef: harnessk8sconnector
-              namespace: go-test
-              automountServiceAccountToken: true
-              nodeSelector: {}
-              os: Linux
-          execution:
-            steps:
-              - step:
-                  type: Run
-                  name: Run Unit Tests
-                  identifier: run_unit_test
-                  spec:
-                    connectorRef: <+input>
-                    image: golang:1.15
-                    shell: Sh
-                    command: |-
-                      set +e
-                      go install gotest.tools/gotestsum@latest
-                      gotestsum --format=standard-verbose --junitfile unit-tests.xml
-                      exit 0
-                    reports:
-                      type: JUnit
+              execution:
+                steps:
+                  - step:
+                      identifier: run_unit_test
+                      type: Run
                       spec:
-                        paths:
-                          - "*.xml"
-
-              - step:
-                  type: Run
-                  name: Go Build
-                  identifier: go_build
-                  spec:
-                    connectorRef: <+input>
-                    image: golang:1.15
-                    shell: Sh
-                    command: |-
-                      set +e
-                      CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo
-                      exit 0
-
-              - step:
-                  type: BuildAndPushDockerRegistry
-                  name: Build And Push Docker Registry
-                  identifier: Build_And_Push_Docker_Registry
-                  spec:
-                    connectorRef: <+input>
-                    repo: <+input>
-                    tags:
-                      - latest
-
-        variables:
-          - name: myStageVar
-            type: String
-            description: ""
-            value: stageVarValue
+                        connectorRef: <+input>.allowedValues(account.harnessImage)
+                  - step:
+                      identifier: go_build
+                      type: Run
+                      spec:
+                        connectorRef: <+input>
+                  - step:
+                      identifier: Build_And_Push_Docker_Registry
+                      type: BuildAndPushDockerRegistry
+                      spec:
+                        connectorRef: <+input>
+                        repo: <+input>
