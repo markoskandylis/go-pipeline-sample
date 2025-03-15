@@ -1,6 +1,6 @@
 pipeline:
-  name: ci-pipeline
-  identifier: cipipeline
+  name: go-ci-pipeline
+  identifier: gocipipeline
   projectIdentifier: default_project
   orgIdentifier: default
   properties:
