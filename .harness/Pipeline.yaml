@@ -26,7 +26,7 @@ pipeline:
                       identifier: run_unit_test
                       type: Run
                       spec:
-                        connectorRef: <+input>.allowedValues(account.harnessImage)
+                        connectorRef: <+input>
                   - step:
                       identifier: go_build
                       type: Run
