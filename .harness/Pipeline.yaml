@@ -26,12 +26,11 @@ pipeline:
                       identifier: run_unit_test
                       type: Run
                       spec:
-                        connectorRef: harnessImage
+                        connectorRef: <+input>
                   - step:
                       identifier: go_build
                       type: Run
-                      spec:
-                        connectorRef: harnessImage
+                      spec: connectorRef:<+input>
                   - step:
                       identifier: Build_And_Push_Docker_Registry
                       type: BuildAndPushDockerRegistry
