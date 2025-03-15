@@ -36,5 +36,5 @@ pipeline:
                       identifier: Build_And_Push_Docker_Registry
                       type: BuildAndPushDockerRegistry
                       spec:
-                        connectorRef: docket
+                        connectorRef: docker
                         repo: mkandylis/go-image-har
