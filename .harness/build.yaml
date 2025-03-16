@@ -71,3 +71,27 @@ pipeline:
             type: String
             description: ""
             value: stageVarValue
+    - stage:
+        name: go-deploy
+        identifier: godeploy
+        tags: {}
+        template:
+          templateRef: godeploy
+          versionLabel: v1
+          templateInputs:
+            type: Deployment
+            spec:
+              environment:
+                environmentRef: <+input>
+                deployToAll: <+input>
+                environmentInputs: <+input>
+                gitOpsClusters: <+input>
+              service:
+                serviceInputs:
+                  serviceDefinition:
+                    type: Kubernetes
+                    spec:
+                      artifacts:
+                        primary:
+                          primaryArtifactRef: <+input>
+                          sources: <+input>
