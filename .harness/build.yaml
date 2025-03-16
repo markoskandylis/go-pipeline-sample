@@ -11,19 +11,16 @@ pipeline:
         build: <+input>
   stages:
     - stage:
-        name: "build test and run"
+        name: build test and run
         identifier: build_test_and_run
-        description: "Run Unit Tests, Build, and Push to Docker"
+        description: Run Unit Tests, Build, and Push to Docker
         type: CI
         spec:
           cloneCodebase: true
-          platform:
-            os: Linux
-            arch: Amd64
           infrastructure:
             type: KubernetesDirect
             spec:
-              connectorRef: harnessk8sconnector 
+              connectorRef: harnessk8sconnector
               namespace: go-test
               automountServiceAccountToken: true
               nodeSelector: {}
@@ -60,7 +57,6 @@ pipeline:
                       set +e
                       CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo
                       exit 0
-
               - step:
                   type: BuildAndPushDockerRegistry
                   name: Build And Push Docker Registry
@@ -70,7 +66,6 @@ pipeline:
                     repo: <+input>
                     tags:
                       - latest
-
         variables:
           - name: myStageVar
             type: String
