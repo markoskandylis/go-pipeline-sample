@@ -72,7 +72,7 @@ pipeline:
             description: ""
             value: stageVarValue
     - stage:
-        name: de
+        name: go-deploy
         identifier: de
         tags: {}
         template:
