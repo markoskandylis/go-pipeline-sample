@@ -71,3 +71,10 @@ pipeline:
             type: String
             description: ""
             value: stageVarValue
+    - stage:
+        name: de
+        identifier: de
+        tags: {}
+        template:
+          templateRef: godeploytemplate
+          versionLabel: v1
