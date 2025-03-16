@@ -1,6 +1,6 @@
 pipeline:
-  name: go-ci-pipeline
-  identifier: gocipipeline
+  name: go-app-ci-pipeline
+  identifier: goappcipipeline
   projectIdentifier: default_project
   orgIdentifier: default
   properties:
@@ -38,10 +38,3 @@ pipeline:
                       spec:
                         connectorRef: docker
                         repo: mkandylis/go-image-har
-    - stage:
-        name: deploy-go
-        identifier: deploygo
-        tags: {}
-        template:
-          templateRef: godeploymanifest
-          versionLabel: v1
