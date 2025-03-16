@@ -1,63 +1,68 @@
-template:
-  name: go-build-stage
-  identifier: go_build_stage
-  versionLabel: v1
-  type: Stage
-  projectIdentifier: default_project
-  orgIdentifier: default
-  spec:
-    type: CI
-    spec:
-      type: CI
-      spec:
-        cloneCodebase: true
-        infrastructure:
-          type: KubernetesDirect
-          spec:
-            connectorRef: harnessk8sconnector
-            namespace: go-test
-            automountServiceAccountToken: true
-            nodeSelector: {}
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: <+input>
+        repoName: go-pipeline-sample
+        build: <+input>
+  stages:
+    - stage:
+        name: "build test and run"
+        identifier: build_test_and_run
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
             os: Linux
-      execution:
-        steps:
-          - step:
-              type: Run
-              name: run unit test
-              identifier: run_unit_test
-              spec:
-                connectorRef: <+input>
-                image: golang:1.15
-                shell: Sh
-                command: |-
-                  set +e
-                  go get gotest.tools/gotestsum
-                  gotestsum --format=standard-verbose --junitfile unit-tests.xml
-                  exit 0
-                reports:
-                  type: JUnit
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: run unit test
+                  identifier: run_unit_test
                   spec:
-                    paths:
-                      - "*.xml"
-          - step:
-              type: Run
-              name: go build
-              identifier: go_build
-              spec:
-                connectorRef: <+input>
-                image: golang:1.15
-                shell: Sh
-                command: |-
-                  set +e
-                  go get gotest.tools/gotestsum
-                  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo
-                  exit 0
-          - step:
-              type: BuildAndPushDockerRegistry
-              name: Build And Push Docker Registry
-              identifier: Build_And_Push_Docker_Registry
-              spec:
-                connectorRef: <+input>
-                repo: <+input>
-                tags:
-                  - latest
+                    connectorRef: <+input>
+                    image: golang:1.15
+                    shell: Sh
+                    command: |-
+                      set +e
+                      go get gotest.tools/gotestsum
+                      gotestsum --format=standard-verbose --junitfile unit-tests.xml
+                      exit 0
+                    reports:
+                      type: JUnit
+                      spec:
+                        paths:
+                          - "*.xml"
+              - step:
+                  type: Run
+                  name: go build
+                  identifier: go_build
+                  spec:
+                    connectorRef: <+input>
+                    image: golang:1.15
+                    shell: Sh
+                    command: |-
+                      set +e
+                      go get gotest.tools/gotestsum
+                      CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo
+                      exit 0
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: Build And Push Docker Registry
+                  identifier: Build_And_Push_Docker_Registry
+                  spec:
+                    connectorRef: <+input>
+                    repo: <+input>
+                    tags:
+                      - latest
+        variables:
+          - name: myStageVar
+            type: String
+            description: ""
+            value: stageVarValue
