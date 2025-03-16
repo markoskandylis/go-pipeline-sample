@@ -38,3 +38,42 @@ pipeline:
                       spec:
                         connectorRef: docker
                         repo: mkandylis/go-image-har
+    - stage:
+        name: deploy-go
+        identifier: deploygo
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: harnessguestbookdep
+          environment:
+            environmentRef: harnessdevenvdep
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: harnessk8sinfradep
+          execution:
+            steps:
+              - step:
+                  name: Rollout Deployment
+                  identifier: rolloutDeployment
+                  type: K8sRollingDeploy
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rollback Rollout Deployment
+                  identifier: rollbackRolloutDeployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
