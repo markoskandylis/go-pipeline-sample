@@ -1,4 +1,8 @@
-  tags: {}
+pipeline:
+  name: ci-pipeline
+  identifier: cipipeline
+  projectIdentifier: default_project
+  orgIdentifier: default
   properties:
     ci:
       codebase:
@@ -9,21 +13,26 @@
     - stage:
         name: "build test and run"
         identifier: build_test_and_run
-        description: ""
+        description: "Run Unit Tests, Build, and Push to Docker"
         type: CI
         spec:
           cloneCodebase: true
           platform:
             os: Linux
             arch: Amd64
-          runtime:
-            type: Cloud
-            spec: {}
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: harnessk8sconnector 
+              namespace: go-test
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
           execution:
             steps:
               - step:
                   type: Run
-                  name: run unit test
+                  name: Run Unit Tests
                   identifier: run_unit_test
                   spec:
                     connectorRef: <+input>
@@ -31,7 +40,7 @@
                     shell: Sh
                     command: |-
                       set +e
-                      go get gotest.tools/gotestsum
+                      go install gotest.tools/gotestsum@latest
                       gotestsum --format=standard-verbose --junitfile unit-tests.xml
                       exit 0
                     reports:
@@ -41,7 +50,7 @@
                           - "*.xml"
               - step:
                   type: Run
-                  name: go build
+                  name: Go Build
                   identifier: go_build
                   spec:
                     connectorRef: <+input>
@@ -49,9 +58,9 @@
                     shell: Sh
                     command: |-
                       set +e
-                      go get gotest.tools/gotestsum
                       CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo
                       exit 0
+
               - step:
                   type: BuildAndPushDockerRegistry
                   name: Build And Push Docker Registry
@@ -61,3 +70,9 @@
                     repo: <+input>
                     tags:
                       - latest
+
+        variables:
+          - name: myStageVar
+            type: String
+            description: ""
+            value: stageVarValue
